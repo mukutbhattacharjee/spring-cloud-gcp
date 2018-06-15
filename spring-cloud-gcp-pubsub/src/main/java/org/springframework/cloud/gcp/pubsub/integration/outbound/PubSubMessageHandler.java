@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.cloud.gcp.pubsub.core.PubSubOperations;
 import org.springframework.cloud.gcp.pubsub.integration.PubSubHeaderMapper;
 import org.springframework.cloud.gcp.pubsub.support.GcpPubSubHeaders;
@@ -52,7 +54,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
  * @author João André Martins
  * @author Mike Eltsufin
  */
-public class PubSubMessageHandler extends AbstractMessageHandler {
+public class PubSubMessageHandler extends AbstractMessageHandler implements BeanFactoryAware {
 
 	private static final long DEFAULT_PUBLISH_TIMEOUT = 10000;
 
@@ -245,9 +247,8 @@ public class PubSubMessageHandler extends AbstractMessageHandler {
 		this.headerMapper = headerMapper;
 	}
 
-	@Override
-	protected void onInit() throws Exception {
-		super.onInit();
-		this.evaluationContext = ExpressionUtils.createStandardEvaluationContext(getBeanFactory());
+	public void setBeanFactory(BeanFactory beanFactory) {
+		Assert.notNull(beanFactory, "'beanFactory' must not be null");
+		this.evaluationContext = ExpressionUtils.createStandardEvaluationContext(beanFactory);
 	}
 }
